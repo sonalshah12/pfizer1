@@ -1,0 +1,620 @@
+<?php
+
+/**
+ * Implements hook_menu()
+ */
+function social_network_actions_menu() {
+  $items = array();
+
+  $items['admin/config/social_network_actions'] = array(
+    'title'             => 'Social Network Actions',
+    'description'       => 'Settings for Social Network Actions module',
+    'page callback'     => 'system_admin_menu_block_page',
+    'access arguments'  => array('administer social_network_actions'),
+    'type' => MENU_NORMAL_ITEM,
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
+  );
+
+  $items['admin/config/social_network_actions/facebook'] = array(
+    'title'             => 'Facebook',
+    'description'       => '',
+    'page callback'     => 'drupal_get_form',
+    'page arguments'    => array('social_network_actions_admin_form'),
+    'access arguments'  => array('administer social_network_actions'),
+    'type'              => MENU_NORMAL_ITEM,
+    'file'              => 'inc/facebook.admin.inc',
+  );
+
+  $items['admin/config/social_network_actions/twitter'] = array(
+    'title'             => 'Twitter',
+    'description'       => '',
+    'page callback'     => 'drupal_get_form',
+    'page arguments'    => array('social_network_actions_admin_form'),
+    'access arguments'  => array('administer social_network_actions'),
+    'type'              => MENU_NORMAL_ITEM,
+    'file'              => 'inc/twitter.admin.inc',
+  );
+
+  $items['admin/config/social_network_actions/google'] = array(
+    'title'             => 'Google +',
+    'description'       => '',
+    'page callback'     => 'drupal_get_form',
+    'page arguments'    => array('social_network_actions_admin_form'),
+    'access arguments'  => array('administer social_network_actions'),
+    'type'              => MENU_NORMAL_ITEM,
+    'file'              => 'inc/google.admin.inc',
+  );
+
+  return $items;
+}
+
+
+/**
+ * Implements hook_theme()
+ */
+function social_network_actions_theme(){
+    return array(
+    'social_network_actions_block_facebook_theme' => array(
+      'template' => 'social_network_actions-block-facebook',
+      'path' => drupal_get_path('module', 'social_network_actions') . '/tpl/',
+      'arguments' => array(
+          'image' => '',
+        ),
+    ),
+    'social_network_actions_block_twitter_theme' => array(
+      'template' => 'social_network_actions-block-twitter',
+      'path' => drupal_get_path('module', 'social_network_actions') . '/tpl/',
+      'arguments' => array(
+        'image' => '',
+      ),
+    ),
+    'social_network_actions_block_facebook_like_div_theme' => array(
+      'template' => 'social_network_actions_block-facebook-like-div',
+      'path' => drupal_get_path('module', 'social_network_actions') . '/tpl/',
+      'arguments' => array(
+        'image' => '',
+      ),
+    ),
+    'social_network_actions_block_twitter_button_theme' => array(
+      'template' => 'social_network_actions-block-twitter-button',
+      'path' => drupal_get_path('module', 'social_network_actions') . '/tpl/',
+      'arguments' => array(
+        'image' => '',
+      ),
+    ),
+    'social_network_actions_block_facebook_like_iframe_theme' => array(
+      'template' => 'social_network_actions_block-facebook-like-iframe',
+      'path' => drupal_get_path('module', 'social_network_actions') . '/tpl/',
+      'arguments' => array(
+        'image' => '',
+      ),
+    ),
+    'social_network_actions_block_google1_theme' => array(
+      'template' => 'social_network_actions_block-google1',
+      'path' => drupal_get_path('module', 'social_network_actions') . '/tpl/',
+      'arguments' => array(
+        'image' => '',
+      ),
+    ),
+    'social_network_actions_block_google_share_theme' => array(
+      'template' => 'social_network_actions_block-google-share',
+      'path' => drupal_get_path('module', 'social_network_actions') . '/tpl/',
+      'arguments' => array(
+        'image' => '',
+      ),
+    ),
+  );
+}
+
+
+/**
+ * Implements hook_block_info()
+ */
+function social_network_actions_block_info() {
+  $blocks = array();
+
+  $blocks['facebook_block'] = array(
+    'info' => t('Facebook Direct Post Block'),
+    'cache' => DRUPAL_CACHE_PER_ROLE,
+  );
+
+  $blocks['facebook_like_block'] = array(
+    'info' => t('Facebook Like Button Block'),
+    'cache' => DRUPAL_CACHE_PER_ROLE,
+  );
+
+  $blocks['twitter_block'] = array(
+    'info' => t('Twitter Direct Post Block'),
+    'cache' => DRUPAL_CACHE_PER_ROLE,
+  );
+
+  $blocks['twitter_button_block'] = array(
+    'info' => t('Twitter Button Block'),
+    'cache' => DRUPAL_CACHE_PER_ROLE,
+  );
+
+  $blocks['google1_block'] = array(
+    'info' => t('Google+1 Block'),
+    'cache' => DRUPAL_CACHE_PER_ROLE,
+  );
+
+  $blocks['google_share_block'] = array(
+    'info' => t('Google Share Block'),
+    'cache' => DRUPAL_CACHE_PER_ROLE,
+  );
+
+  return $blocks;
+}
+
+/**
+ * Implementation of hook_block_configure()
+ */
+function social_network_actions_block_configure($delta = '') {
+  switch($delta) {
+    case 'facebook_block':
+      $form['facebook']['social_network_actions_facebook_block_image_button'] = array(
+        '#title' => t('Image'),
+        '#type' => 'managed_file',
+        '#description' => t('Upload the image for the button here'),
+        '#default_value' => variable_get('social_network_actions_facebook_block_image_button', ''),
+        '#upload_location' => 'public://public/file/',
+        '#required' => FALSE,
+      );
+      return $form;
+    break;
+    
+    case 'twitter_block':
+      $form['twitter']['social_network_actions_twitter_block_image_button'] = array(
+        '#title' => t('Image'),
+        '#type' => 'managed_file',
+        '#description' => t('Upload the image for the button here'),
+        '#default_value' => variable_get('social_network_actions_twitter_block_image_button', ''),
+        '#upload_location' => 'public://public/file/',
+        '#required' => FALSE,
+      );
+      return $form;
+    break;
+
+    case 'twitter_button_block':
+      $form['twitter_button'] = array(
+        '#type' => 'fieldset',
+        '#title' => t('Twitter Button'),
+        '#collapsible' => TRUE,
+        '#collapsed' => FALSE,
+      );
+
+      $form['twitter_button']['social_network_actions_twitter_displays'] = array(
+        '#type' => 'select',
+        '#title' => t('Display'),
+        '#options' => array('none' => 'None',
+        'horizontal' => 'Horizontal',
+        'vertical' => 'Vertical'),
+        '#required' => TRUE,
+        '#default_value' => variable_get('social_network_actions_twitter_displays', 'none'),
+        '#description' => t('Choose the button’s look'),
+      );
+      return $form;
+    break;
+
+    case 'facebook_like_block':
+      $form = _social_network_actions_get_facebook_like_block_configuration();
+      return $form;
+    break;
+
+    case 'google1_block':
+      $form = _social_network_actions_get_google1_block_configuration();
+      return $form;
+    break;
+
+    case 'google_share_block':
+      $form = _social_network_actions_get_google_share_block_configuration();
+      return $form;
+    break;
+  }
+
+}
+
+/**
+ * Implementation of hook_block_save().
+ */
+function social_network_actions_block_save($delta = '', $edit = array()) {
+  switch($delta) {
+    case 'facebook_block':
+    case 'twitter_block':
+      variable_set('social_network_actions_'. $delta .'_image_button', $edit['social_network_actions_'. $delta .'_image_button']);
+    break;
+    case 'twitter_button_block':
+     variable_set('social_network_actions_twitter_displays', $edit['social_network_actions_twitter_displays']);
+    break;
+    case 'facebook_like_block':
+      variable_set('social_network_actions_layout', $edit['social_network_actions_layout']);
+      variable_set('social_network_actions_action', $edit['social_network_actions_action']);
+      variable_set('social_network_actions_font', $edit['social_network_actions_font']);
+      variable_set('social_network_actions_div_width', $edit['social_network_actions_div_width']);
+      variable_set('social_network_actions_facebook_send', $edit['social_network_actions_facebook_send']);
+      variable_set('social_network_actions_type_tpl', $edit['social_network_actions_type_tpl']);
+    break;
+    case 'google1_block':
+      variable_set('social_network_actions_google1_url', $edit['social_network_actions_google1_url']);
+      variable_set('social_network_actions_google1_size', $edit['social_network_actions_google1_size']);
+      variable_set('social_network_actions_google1_width', $edit['social_network_actions_google1_width']);
+      variable_set('social_network_actions_google1_annotation', $edit['social_network_actions_google1_annotation']);
+    break;
+    case 'google_share_block':
+      variable_set('social_network_actions_google_share_size', $edit['social_network_actions_google_share_size']);
+      variable_set('social_network_actions_google_share_width', $edit['social_network_actions_google_share_width']);
+      variable_set('social_network_actions_google_share_annotation', $edit['social_network_actions_google_share_annotation']);
+    break;
+  }
+}
+
+/**
+ * Implementation of hook_block_view()
+ */
+function social_network_actions_block_view($delta = '') {
+ switch ($delta) {
+    case 'facebook_block':
+    case 'twitter_block':
+      
+      _social_network_actions_load_js($delta);
+      return array(
+        'subject' => '',
+        'content' => _social_network_actions_render_block($delta),
+      );
+    break;
+    case 'twitter_button_block':
+        $conf = array(
+            'social_network' => 'twitter',
+            'type' => 'button',
+            'display' => variable_get('social_network_actions_twitter_displays', 'none'),
+            'languaje' => variable_get('social_network_actions_twitter_language', 'en'),
+            'url' => variable_get('social_network_actions_twitter_url', ''),
+            'via' => variable_get('social_network_actions_twitter_via', ''),
+        );
+      return array(
+        'subject' => '',
+        'content' => _social_network_actions_theme($conf),
+      );
+    break;
+    case 'facebook_like_block':
+        $conf = array(
+          'social_network' => 'facebook',
+          'type' => variable_get('social_network_actions_type_tpl', ''),
+          'url' => variable_get('social_network_actions_facebook_page', "http://www.facebook.com/"),
+          'layout' => variable_get('social_network_actions_layout', "standard"),
+          'action' => variable_get('social_network_actions_action', "like"),
+          'font' => variable_get('social_network_actions_font', "arial"),
+          'width' => variable_get('social_network_actions_div_width', '450'),
+          'appId' => variable_get('social_network_actions_facebook_api_id', ''),
+          'send' => variable_get('social_network_actions_facebook_send', '')
+        );
+      return array(
+        'subject' => '',
+        'content' => _social_network_actions_theme($conf),
+      );
+      break;
+    case 'google1_block':
+      $conf = array(
+        'social_network' => 'google',
+        'type' => 'google+1',
+        'url' => variable_get('social_network_actions_google1_url', ""),
+        'size' => variable_get('social_network_actions_google1_size', ""),
+        'width' => variable_get('social_network_actions_google1_width', ""),
+        'annotation' => variable_get('social_network_actions_google1_annotation', ""),
+        'language' => variable_get('social_network_actions_language', "")
+      );
+      return array(
+        'subject' => '',
+        'content' => _social_network_actions_theme($conf),
+      );
+      break;
+    case 'google_share_block':
+
+      if(variable_get('social_network_actions_google_share_annotation') == 'vertical-bubble'){
+        $size = 60;
+      } else {
+        $size = variable_get('social_network_actions_google_share_size');
+      }
+
+      $conf = array(
+        'social_network' => 'google',
+        'type' => 'share',
+        'size' => $size,
+        'width' => variable_get('social_network_actions_google_share_width', ""),
+        'annotation' => variable_get('social_network_actions_google_share_annotation', ""),
+        'language' => variable_get('social_network_actions_google_language', "")
+      );
+      return array(
+        'subject' => '',
+        'content' => _social_network_actions_theme($conf),
+      );
+      break;
+  }
+}
+
+/*
+* Helper function to render the content of the block
+*
+* @param $delta The delta of the block desired
+*
+* @return string The content of the block
+*/
+function _social_network_actions_render_block($delta = ''){
+  $content_block = '';
+  switch ($delta) {
+    
+
+    case 'facebook_block':
+      if( variable_get('social_network_actions_facebook_api_id') != '' && 
+        variable_get('social_network_actions_facebook_status') == 1) {
+
+        $content_block .= theme("social_network_actions_block_facebook_theme", array('image' => _social_network_actions_get_social_image($delta)));
+      }
+    break;
+
+    case 'twitter_block':
+      if( variable_get('social_network_actions_twitter_status') == 1) {
+
+          $content_block .= theme("social_network_actions_block_twitter_theme", array('image' => _social_network_actions_get_social_image($delta)));
+      }
+    break;
+
+  }
+  return $content_block;
+}
+
+function _social_network_actions_theme($conf) {
+  if($conf['social_network'] == 'facebook'){
+    if($conf['type'] == 'iframe'){
+      $output = theme("social_network_actions_block_facebook_like_iframe_theme", array('conf' => $conf));
+    } else {
+      $output = theme("social_network_actions_block_facebook_like_div_theme", array('conf' => $conf));
+    } 
+  } elseif($conf['social_network'] == 'twitter'){
+    if($conf['type'] == 'button'){
+      $output = theme("social_network_actions_block_twitter_button_theme", array('conf' => $conf));
+    }
+  } elseif($conf['social_network'] == 'google'){
+    if($conf['type'] == 'google+1') {
+      $output = theme("social_network_actions_block_google1_theme", array('conf' => $conf));
+    } elseif ($conf['type'] == 'share') {
+      $output = theme("social_network_actions_block_google_share_theme", array('conf' => $conf));
+    }
+  }
+   
+  return $output;
+}
+
+/**
+* Helper function to the corresponding social network image
+*/
+function _social_network_actions_get_social_image($service = ''){
+  $image_url = '/';
+  switch ($service){
+    case 'facebook_block':
+        if(variable_get('social_network_actions_facebook_block_image_button', false)){
+          $image = file_load(variable_get('social_network_actions_facebook_block_image_button', false));
+          $image_url = file_create_url($image->uri);
+        } else {
+          $image_url .= drupal_get_path('module', 'social_network_actions') . '/images/fb.png';  
+        }
+
+    break;
+
+    case 'twitter_block':
+        if(variable_get('social_network_actions_twitter_block_image_button', false)){
+          $image = file_load(variable_get('social_network_actions_twitter_block_image_button', false));  
+          $image_url = file_create_url($image->uri);
+        } else {
+          
+          $image_url .= drupal_get_path('module', 'social_network_actions') . '/images/tw.png'; 
+        }
+       
+    break;
+
+  }
+
+  return $image_url;
+}
+
+/*
+* Helper function to render form configuration Facebook Like Button
+*
+* @return form
+*/
+function _social_network_actions_get_facebook_like_block_configuration() {
+
+  $form['facebook_like_button'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Facebook Like Button'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+
+  $form['facebook_like_button']['social_network_actions_div_width'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Width(px)'),
+    '#default_value' => variable_get('social_network_actions_div_width', '450'),
+    '#description' => t('Choose the button’s width container.'),
+  );
+
+  $form['facebook_like_button']['social_network_actions_type_tpl'] = array(
+    '#type' => 'select',
+    '#title' => t('Type Template'),
+    '#options' => array('div' => 'Div',
+    'iframe' => 'iFrame'),
+    '#default_value' => variable_get('social_network_actions_type_tpl', 'div'),
+    '#description' => t('Choose the block\'s rendering method.'),
+  );
+
+  $form['facebook_like_button']['social_network_actions_facebook_send'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Send Button'),
+    '#description' => t('Mark this option so the ‘Like’ button appears next to the ‘Send’ button'),
+    '#default_value' => variable_get('social_network_actions_facebook_send', ''),
+  );
+
+  $form['facebook_like_button']['social_network_actions_layout'] = array(
+    '#type' => 'select',
+    '#title' => t('Layout style'),
+    '#options' => array('standard' => t('Standard'), 'box_count' => t('Box Count'), 'button_count' => t('Button Count')),
+    '#default_value' => variable_get('social_network_actions_layout', 'standard'),
+    '#description' => t('Determines the size and amount of social context next to the button.'),
+  );
+
+  $form['facebook_like_button']['social_network_actions_action'] = array(
+    '#type' => 'select',
+    '#title' => t('Verb to display'),
+    '#options' => array('like' => t('Like'), 'recommend' => t('Recommend')),
+    '#default_value' => variable_get('social_network_actions_action', 'like'),
+    '#description' => t('The verbiage to display inside the button itself.'),
+  );
+
+  $form['facebook_like_button']['social_network_actions_font'] = array(
+    '#type' => 'select',
+    '#title' => t('Font'),
+    '#options' => array('arial' => 'Arial',
+    'lucida+grande' => 'Lucida Grande',
+    'segoe+ui' => 'Segoe UI',
+    'tahoma' => 'Tahoma',
+    'trebuchet+ms' => 'Trebuchet MS',
+    'verdana' => 'Verdana'),
+    '#default_value' => variable_get('social_network_actions_font', 'arial'),
+    '#description' => t('The font with which to display the text of the button.'),
+  );
+
+  return $form;
+
+}
+
+/*
+* Helper function to render form configuration Google+1 Button
+*
+* @return form
+*/
+function _social_network_actions_get_google1_block_configuration() {
+
+  $form['google+1'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Google +1'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+
+  $form['google+1']['social_network_actions_google1_url'] = array(
+    '#type' => 'textfield',
+    '#title' => t('URL'),
+    '#default_value' => variable_get('social_network_actions_google1_url', ''),
+    '#description' => t('Enter the destiny URL to add the +1'),
+    '#required' => TRUE,
+  );
+
+  $form['google+1']['social_network_actions_google1_size'] = array(
+    '#type' => 'select',
+    '#title' => t('Size'),
+    '#options' => array('small' => 'Small',
+    'medium' => 'Medium',
+    'standard' => 'Standard',
+    'tall' => 'Large'),
+    '#default_value' => variable_get('social_network_actions_google1_size', 'small'),
+    '#description' => t('Choose the button’s size.'),
+  );
+
+  $form['google+1']['social_network_actions_google1_width'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Width(px)'),
+    '#default_value' => variable_get('social_network_actions_google1_width', '450'),
+    '#description' => t('Choose the button’s width container.'),
+  );
+
+  $form['google+1']['social_network_actions_google1_annotation'] = array(
+    '#type' => 'select',
+    '#title' => t('Annotation'),
+    '#options' => array('inline' => 'inline',
+    'bubble' => 'bubble',
+    'none' => 'none'),
+    '#default_value' => variable_get('social_network_actions_google1_annotation', 'none'),
+    '#description' => t('Choose the button’s look'),
+  );
+
+  return $form;
+}
+
+/*
+* Helper function to render form configuration Google Share Button
+*
+* @return form
+*/
+function _social_network_actions_get_google_share_block_configuration() {
+  
+  $form['google_share'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Google Share'),
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+
+  $form['google_share']['social_network_actions_google_share_size'] = array(
+    '#type' => 'select',
+    '#title' => t('Size'),
+    '#options' => array('15' => 'Small',
+    '20' => 'Medium',
+    '24' => 'Large'),
+    '#default_value' => variable_get('social_network_actions_google_share_size', 'small'),
+    '#description' => t('Choose the button’s size.'),
+  );
+
+  $form['google_share']['social_network_actions_google_share_width'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Width(px)'),
+    '#default_value' => variable_get('social_network_actions_google_share_width', '450'),
+    '#description' => t('Choose the button’s width container.'),
+  );
+
+  $form['google_share']['social_network_actions_google_share_annotation'] = array(
+    '#type' => 'select',
+    '#title' => t('Annotation'),
+    '#options' => array('inline' => 'inline',
+    'bubble' => 'bubble (horizontal)',
+    'vertical-bubble' => 'bubble (vertical)',
+    'none' => 'none'),
+    '#default_value' => variable_get('social_network_actions_google_share_annotation', 'none'),
+    '#description' => t('Choose the button’s look'),
+  );
+
+  return $form;
+}
+
+/**
+* Helper function to call all the javascripts needed
+*/
+function _social_network_actions_load_js($service = '') {
+  drupal_add_js(array('social_network_actions' => array(
+                        'facebook' => array(
+                          'status' => variable_get('social_network_actions_facebook_status', ''),
+                          'appId' => variable_get('social_network_actions_facebook_api_id', ''), 
+                          'post' => variable_get('social_network_actions_facebook_messager', ''),
+                        ),
+                        'twitter' => array(                                                                    
+                          'status' => variable_get('social_network_actions_twitter_status', ''),
+                          'post' => variable_get('social_network_actions_twitter_messager', ''),
+                          'url' => variable_get('social_network_actions_twitter_url', ''),
+                          'via' => variable_get('social_network_actions_twitter_via', ''),
+                        )
+                )),'setting');
+
+  drupal_add_js('http://connect.facebook.net/en_US/all.js', 'external');
+  
+  switch($service) {
+    case 'facebook_block':
+      drupal_add_js(drupal_get_path('module', 'social_network_actions') . '/script/facebook.js');
+      drupal_add_js(drupal_get_path('module', 'social_network_actions') . '/script/facebook_publish.js');
+    break;
+    
+    case 'twitter_block':
+      drupal_add_js(drupal_get_path('module', 'social_network_actions') . '/script/twitter.js');
+    break;
+    
+  }
+}

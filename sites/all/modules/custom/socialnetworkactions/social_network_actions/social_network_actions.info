@@ -1,0 +1,5 @@
+name = Social Network Actions
+description = Performs direct post to social networks
+package = pfizer
+version = "7.x-1.3"
+core = 7.x

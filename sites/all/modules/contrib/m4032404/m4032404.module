@@ -1,0 +1,30 @@
+<?php
+
+/**
+ * @file
+ *  403 to 404 module functions.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function m4032404_menu() {
+
+  $items = array();
+  $items['m4032404'] = array(
+    'title' => '403 to 404 callback',
+    'page callback' => 'm4032404_callback',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * 403 to 404 callback function for outputting the error page.
+ */
+function m4032404_callback() {
+  drupal_not_found();
+  drupal_exit();
+}

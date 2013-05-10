@@ -1,0 +1,11 @@
+name = 403 to 404
+description = "Emit a 404 response for access denied pages"
+
+core = 7.x
+
+; Information added by drupal.org packaging script on 2013-02-25
+version = "7.x-1.0-beta1"
+core = "7.x"
+project = "m4032404"
+datestamp = "1361785536"
+

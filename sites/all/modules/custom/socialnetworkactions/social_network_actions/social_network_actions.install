@@ -1,0 +1,26 @@
+<?php
+/**
+ * @file
+ * Install, update and uninstall functions for the social_network_actions module.
+ */
+
+
+/**
+ * Implements hook_install().
+ */
+function social_network_actions_install() {}
+
+/**
+ * Implements hook_uninstall().
+ */
+function social_network_actions_uninstall() {
+  social_network_actions_delete_variables();
+  watchdog('Social Network Actions', 'Module uninstalled.');
+}
+
+/**
+ * Delete all module variables
+ */
+function social_network_actions_delete_variables() {
+  db_delete('variable')->condition('name', 'social_network_actions_%', 'LIKE')->execute();
+}
