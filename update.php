@@ -1,7 +1,8 @@
 <?php
 
+
 /**
- * Root directory of Drupal installation.
+ * Root directory of Drupal installation.dsdsd
  */
 define('DRUPAL_ROOT', getcwd());
 
